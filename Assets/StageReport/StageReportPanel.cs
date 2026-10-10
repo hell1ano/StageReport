@@ -149,7 +149,14 @@ namespace StageReport
                         var itemDef = ItemCatalog.GetItemDef(interactableGroup.itemIndex);
                         if (itemDef != null)
                         {
-                            itemIcon.GetComponent<RawImage>().texture = itemDef.pickupIconTexture;
+                            var image = itemIcon.GetComponent<RawImage>();
+                            image.enabled = false;
+                            var asyncImage = itemIcon.AddComponent<AsyncRawImage>();
+                            asyncImage.SetAssetOrDirectReference(itemDef.GetIconReference(), itemDef.pickupIconSprite);
+                        }
+                        else
+                        {
+                            itemIcon.SetActive(false);
                         }
                     }
                 }

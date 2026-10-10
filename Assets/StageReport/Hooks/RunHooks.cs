@@ -44,6 +44,15 @@ namespace StageReport
         {
             if (self.exitState == SceneExitController.ExitState.Idle)
             {
+                if (NetworkServer.active && InteractableTracker.instance)
+                {
+                    InteractableHooks.RefreshPrinterItems();
+                    foreach (var entry in InteractableTracker.instance.trackedInteractables)
+                    {
+                        var visible = ModConfig.visibleInteractables.TryGetValue(entry.type, out var setting) && setting.Value;
+                        Log.Debug($"Recap entry: {entry.type}, netId={entry.netId}, remaining={entry.charges}, item={entry.itemIndex}, visible={visible}");
+                    }
+                }
                 InteractableTracker.instance.RpcShowRecap();
             }
             orig(self);

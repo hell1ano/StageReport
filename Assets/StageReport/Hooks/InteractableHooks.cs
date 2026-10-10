@@ -78,6 +78,27 @@ namespace StageReport
         private static void ShopTerminalBehavior_UpdatePickupDisplayAndAnimations(On.RoR2.ShopTerminalBehavior.orig_UpdatePickupDisplayAndAnimations orig, ShopTerminalBehavior self)
         {
             orig(self);
+            UpdatePrinterItem(self);
+        }
+
+        public static void RefreshPrinterItems()
+        {
+            if (!NetworkServer.active || !InteractableTracker.instance)
+            {
+                return;
+            }
+            foreach (var terminal in UnityEngine.Object.FindObjectsOfType<ShopTerminalBehavior>())
+            {
+                UpdatePrinterItem(terminal);
+            }
+        }
+
+        private static void UpdatePrinterItem(ShopTerminalBehavior self)
+        {
+            if (!NetworkServer.active || !InteractableTracker.instance)
+            {
+                return;
+            }
             if (self.pickup.pickupIndex == PickupIndex.none)
             {
                 return;
@@ -99,7 +120,11 @@ namespace StageReport
             }
 
             PickupDef pickupDef = PickupCatalog.GetPickupDef(self.pickup.pickupIndex);
-            ItemDef itemDef = ItemCatalog.GetItemDef(pickupDef.itemIndex);
+            ItemDef itemDef = pickupDef != null ? ItemCatalog.GetItemDef(pickupDef.itemIndex) : null;
+            if (itemDef == null)
+            {
+                return;
+            }
             trackedInteractable.itemIndex = itemDef.itemIndex;
 
 
@@ -200,7 +225,8 @@ namespace StageReport
                 {
                     netId = self.GetComponent<NetworkIdentity>().netId.Value,
                     type = interactableDef.type,
-                    charges = interactableDef.charges
+                    charges = interactableDef.charges,
+                    itemIndex = ItemIndex.None
                 };
 
                 InteractableTracker.instance.trackedInteractables.Add(trackedInteractable);
@@ -315,7 +341,8 @@ namespace StageReport
                 {
                     netId = self.GetComponent<NetworkIdentity>().netId.Value,
                     type = interactableDef.type,
-                    charges = interactableDef.charges
+                    charges = interactableDef.charges,
+                    itemIndex = ItemIndex.None
                 };
 
                 InteractableTracker.instance.trackedInteractables.Add(trackedInteractable);
