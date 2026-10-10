@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: InteractablesCollection
   m_EditorClassIdentifier: 
   interactables:
+  - {fileID: 11400000, guid: 9c56c5eb942641429c7a4bfaaebdd153, type: 2}
   - {fileID: 11400000, guid: 5fc495b9774dc7045ad96c6723824906, type: 2}
   - {fileID: 11400000, guid: f310b246d56619147aae595e292f43c1, type: 2}
   - {fileID: 11400000, guid: 1dcd285c755675449a91c2d3aa423f8e, type: 2}

@@ -135,7 +135,12 @@ namespace StageReport
             {
                 var interactableIcon = Instantiate(interactableIconPrefab, interactablePanel.transform);
 
-                interactableIcon.transform.Find("Timer").gameObject.SetActive(false);
+                // The game's icon prefab may not include a timer in newer versions.
+                var timer = interactableIcon.transform.Find("Timer");
+                if (timer != null)
+                {
+                    timer.gameObject.SetActive(false);
+                }
 
                 RawImage rawImage = interactableIcon.GetComponent<RawImage>();
                 rawImage.texture = interactableGroup.def.Texture;

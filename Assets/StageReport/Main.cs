@@ -38,6 +38,7 @@ namespace StageReport
 
             RoR2Application.onLoad += () =>
             {
+                R2API.LanguageAPI.Add("STAGERECAP_HOLLOW_CHEST_FREE_NAME", "Hollow Chest (Free)");
                 ModConfig.Init(Config);
             };
 
