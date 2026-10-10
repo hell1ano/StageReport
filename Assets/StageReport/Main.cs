@@ -39,6 +39,7 @@ namespace StageReport
             RoR2Application.onLoad += () =>
             {
                 R2API.LanguageAPI.Add("STAGERECAP_HOLLOW_CHEST_FREE_NAME", "Hollow Chest (Free)");
+                R2API.LanguageAPI.Add("STAGERECAP_COMPULSION_SHRINE_NAME", "Shrine of Compulsion");
                 ModConfig.Init(Config);
             };
 

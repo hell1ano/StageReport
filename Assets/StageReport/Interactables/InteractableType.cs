@@ -89,6 +89,7 @@ namespace StageReport
         JunkDrone,
         RechargeDrone,
 
-        HollowChestFree
+        HollowChestFree,
+        CompulsionShrine
     }
 }

@@ -306,7 +306,6 @@ namespace StageReport
 
                 Log.Debug(interactableDef.type + " found");
 
-                int index = InteractableTracker.instance.trackedInteractables.Count;
                 var trackedInteractable = new TrackedInteractable
                 {
                     netId = self.GetComponent<NetworkIdentity>().netId.Value,
@@ -326,8 +325,13 @@ namespace StageReport
 
                 self.onPurchase.AddListener(interactor =>
                 {
-                    trackedInteractable.charges = Mathf.Max(0, trackedInteractable.charges - 1);
-                    InteractableTracker.instance.trackedInteractables[index] = trackedInteractable;
+                    // Entries can be removed after registration; resolve the current index.
+                    var index = FindInteractableIndex(trackedInteractable.netId);
+                    if (index.HasValue)
+                    {
+                        var current = InteractableTracker.instance.trackedInteractables[index.Value];
+                        SetCharges(current.netId, Mathf.Max(0, current.charges - 1));
+                    }
                 });
             }
         }

@@ -32,6 +32,21 @@ namespace StageReport
                 interactables = interactables.Concat(new[] { hollowChest }).ToArray();
             }
 
+            if (!interactables.Any(x => x.type == InteractableType.CompulsionShrine))
+            {
+                var compulsionShrine = Instantiate(interactables.First(x => x.type == InteractableType.ChanceShrine));
+                compulsionShrine.name = "CompulsionShrine";
+                compulsionShrine.type = InteractableType.CompulsionShrine;
+                compulsionShrine.nameToken = "STAGERECAP_COMPULSION_SHRINE_NAME";
+                compulsionShrine.charges = 1;
+                compulsionShrine.gameObjectNames = new[] { "ShrineCompulsion(Clone)" };
+                interactables = interactables.Concat(new[] { compulsionShrine }).ToArray();
+            }
+
+            var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);
+            halcyoniteShrine.gameObjectNames = halcyoniteShrine.gameObjectNames
+                .Concat(new[] { "ShrineHalcyonite_Stage1 Variant(Clone)" }).Distinct().ToArray();
+
             _interactableByType = interactables
                 .ToDictionary(x => x.type);
 

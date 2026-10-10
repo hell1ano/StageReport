@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49a8e7e0d0e08da428a79d57d8d6d842, type: 3}
+  m_Name: CompulsionShrine
+  m_EditorClassIdentifier: 
+  type: 66
+  nameToken: STAGERECAP_COMPULSION_SHRINE_NAME
+  texture: {fileID: 2800000, guid: c6d28396e77e3034a8e0c7169df14528, type: 3}
+  textureKey: 
+  charges: 1
+  defaultScoreWeight: 60
+  gameObjectNames:
+  - ShrineCompulsion(Clone)
