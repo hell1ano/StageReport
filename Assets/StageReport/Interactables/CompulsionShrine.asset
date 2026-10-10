@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   type: 66
   nameToken: STAGERECAP_COMPULSION_SHRINE_NAME
-  texture: {fileID: 2800000, guid: c6d28396e77e3034a8e0c7169df14528, type: 3}
+  texture: {fileID: 0}
   textureKey: 
   charges: 1
   defaultScoreWeight: 60

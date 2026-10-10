@@ -294,6 +294,11 @@ namespace StageReport
             orig(self);
 
             Log.Debug("PurchaseInteraction_PreStartClient " + self.gameObject.name);
+            var iconDefinition = InteractablesCollection.instance.GetByGameObjectName(self.gameObject.name);
+            if (iconDefinition != null && iconDefinition.type == InteractableType.CompulsionShrine)
+            {
+                Main.Instance.StartCoroutine(ShrineModelIcon.Capture(self.gameObject, iconDefinition));
+            }
             if (NetworkServer.active)
             {
                 InteractableDef interactableDef = InteractablesCollection.instance.GetByGameObjectName(self.gameObject.name);

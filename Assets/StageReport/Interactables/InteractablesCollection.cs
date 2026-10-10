@@ -39,9 +39,13 @@ namespace StageReport
                 compulsionShrine.type = InteractableType.CompulsionShrine;
                 compulsionShrine.nameToken = "STAGERECAP_COMPULSION_SHRINE_NAME";
                 compulsionShrine.charges = 1;
+                compulsionShrine.SetRuntimeTexture(null);
                 compulsionShrine.gameObjectNames = new[] { "ShrineCompulsion(Clone)" };
                 interactables = interactables.Concat(new[] { compulsionShrine }).ToArray();
             }
+
+            // Never display another shrine's artwork for Compulsion.
+            interactables.First(x => x.type == InteractableType.CompulsionShrine).SetRuntimeTexture(null);
 
             var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);
             halcyoniteShrine.gameObjectNames = halcyoniteShrine.gameObjectNames

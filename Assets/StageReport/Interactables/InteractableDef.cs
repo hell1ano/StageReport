@@ -22,8 +22,16 @@ namespace StageReport
         public string[] gameObjectNames;
 
         private Texture2D _texture;
+
+        public void SetRuntimeTexture(Texture2D value)
+        {
+            _texture = value;
+            texture = value;
+            textureKey = null;
+        }
+
         public Texture2D Texture => _texture == null
-            ? _texture = (texture != null ? texture : Addressables.LoadAssetAsync<Texture2D>(textureKey).WaitForCompletion())
+            ? _texture = (texture != null ? texture : (string.IsNullOrEmpty(textureKey) ? null : Addressables.LoadAssetAsync<Texture2D>(textureKey).WaitForCompletion()))
             : _texture;
 
         public int score => Application.isEditor
