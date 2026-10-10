@@ -21,7 +21,7 @@ namespace StageReport
             On.RoR2.UI.PingIndicator.GetInteractableIcon += PingIndicator_GetInteractableIcon;
         }
 
-        private static void RevealedObject_OnEnable(On.RoR2.ChestRevealer.RevealedObject.orig_OnEnable orig, UnityEngine.MonoBehaviour self)
+        private static void RevealedObject_OnEnable(On.RoR2.ChestRevealer.RevealedObject.orig_OnEnable orig, RoR2.ChestRevealer.RevealedObject self)
         {
             Log.Debug("RevealedObject_OnEnable " + self.name);
             try

@@ -21,6 +21,17 @@ namespace StageReport
         {
             instance = this;
 
+            // Also support the released bundle, which predates this definition.
+            if (!interactables.Any(x => x.type == InteractableType.HollowChestFree))
+            {
+                var hollowChest = Instantiate(interactables.First(x => x.type == InteractableType.Chest));
+                hollowChest.name = "HollowChestFree";
+                hollowChest.type = InteractableType.HollowChestFree;
+                hollowChest.nameToken = "STAGERECAP_HOLLOW_CHEST_FREE_NAME";
+                hollowChest.gameObjectNames = new[] { "HollowChestFree(Clone)" };
+                interactables = interactables.Concat(new[] { hollowChest }).ToArray();
+            }
+
             _interactableByType = interactables
                 .ToDictionary(x => x.type);
 
