@@ -6,15 +6,15 @@ namespace StageReport
 {
     public static class ShrineModelIcon
     {
-        private static bool pending;
+        private static readonly System.Collections.Generic.HashSet<InteractableType> pending = new System.Collections.Generic.HashSet<InteractableType>();
 
         public static IEnumerator Capture(GameObject source, InteractableDef definition)
         {
-            if (pending || definition.texture != null)
+            if (pending.Contains(definition.type) || definition.texture != null)
             {
                 yield break;
             }
-            pending = true;
+            pending.Add(definition.type);
             // Let the spawned shrine initialize its model before copying it.
             yield return null;
             try
@@ -26,11 +26,11 @@ namespace StageReport
             }
             catch (Exception exception)
             {
-                Log.Error("Could not render the Compulsion shrine icon: " + exception);
+                Log.Error("Could not render shrine icon: " + exception);
             }
             finally
             {
-                pending = false;
+                pending.Remove(definition.type);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using RoR2;
+using RoR2;
 using RoR2.UI;
 using RoR2.UI.SkinControllers;
 using System;
@@ -96,6 +96,38 @@ namespace StageReport
             StartCoroutine(RenderInteractables(textMesh, trackedInteractables));
         }
 
+        private IEnumerator LoadPrinterIcon(RawImage image, ItemDef itemDef)
+        {
+            Sprite sprite = itemDef.pickupIconSprite;
+            if (sprite == null)
+            {
+                var reference = itemDef.GetIconReference();
+                if (reference == null || !reference.RuntimeKeyIsValid())
+                {
+                    Log.Error("Printer icon has no valid sprite reference: " + itemDef.name);
+                    yield break;
+                }
+                var handle = Addressables.LoadAssetAsync<Sprite>(reference.RuntimeKey);
+                // Keep the sprite alive for the lifetime of the recap panel.
+                OnDestroyCallback.AddCallback(gameObject, _ => Addressables.Release(handle));
+                yield return handle;
+                if (handle.Status != UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                {
+                    Log.Error("Could not load printer icon for " + itemDef.name + ": " + handle.OperationException);
+                    yield break;
+                }
+                sprite = handle.Result;
+            }
+            if (image == null || sprite == null) yield break;
+            image.texture = sprite.texture;
+            var rect = sprite.textureRect;
+            image.uvRect = new Rect(rect.x / sprite.texture.width, rect.y / sprite.texture.height,
+                rect.width / sprite.texture.width, rect.height / sprite.texture.height);
+            image.color = Color.white;
+            image.enabled = true;
+            Log.Debug("Printer icon loaded: " + itemDef.name);
+        }
+
         private IEnumerator RenderInteractables(HGTextMeshProUGUI textMesh, IList<TrackedInteractable> trackedInteractables)
         {
             yield return new WaitForSeconds(interactableShowInitialDelay);
@@ -151,8 +183,7 @@ namespace StageReport
                         {
                             var image = itemIcon.GetComponent<RawImage>();
                             image.enabled = false;
-                            var asyncImage = itemIcon.AddComponent<AsyncRawImage>();
-                            asyncImage.SetAssetOrDirectReference(itemDef.GetIconReference(), itemDef.pickupIconSprite);
+                            StartCoroutine(LoadPrinterIcon(image, itemDef));
                         }
                         else
                         {

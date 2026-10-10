@@ -44,7 +44,8 @@ namespace StageReport
                 interactables = interactables.Concat(new[] { compulsionShrine }).ToArray();
             }
 
-            // Never display another shrine's artwork for Compulsion.
+            // Use the actual models for both Hex interactables.
+            interactables.First(x => x.type == InteractableType.HollowChestFree).SetRuntimeTexture(null);
             interactables.First(x => x.type == InteractableType.CompulsionShrine).SetRuntimeTexture(null);
 
             var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);

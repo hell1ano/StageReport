@@ -321,8 +321,9 @@ namespace StageReport
 
             Log.Debug("PurchaseInteraction_PreStartClient " + self.gameObject.name);
             var iconDefinition = InteractablesCollection.instance.GetByGameObjectName(self.gameObject.name);
-            if (iconDefinition != null && iconDefinition.type == InteractableType.CompulsionShrine)
+            if (iconDefinition != null && (iconDefinition.type == InteractableType.CompulsionShrine || iconDefinition.type == InteractableType.HollowChestFree))
             {
+                if (!string.IsNullOrEmpty(self.displayNameToken)) iconDefinition.nameToken = self.displayNameToken;
                 Main.Instance.StartCoroutine(ShrineModelIcon.Capture(self.gameObject, iconDefinition));
             }
             if (NetworkServer.active)
