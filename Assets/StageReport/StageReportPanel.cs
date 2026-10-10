@@ -100,8 +100,6 @@ namespace StageReport
         {
             yield return new WaitForSeconds(interactableShowInitialDelay);
 
-            GameObject interactableIconPrefab = Addressables.LoadAssetAsync<GameObject>(interactableIconPrefabKey).WaitForCompletion();
-
             var interactableGroups = trackedInteractables
                 .Where(x => Application.isEditor || ModConfig.visibleInteractables[x.type].Value)
                 .Select(x => (
@@ -133,14 +131,7 @@ namespace StageReport
 
             foreach (var interactableGroup in interactableGroups)
             {
-                var interactableIcon = Instantiate(interactableIconPrefab, interactablePanel.transform);
-
-                // The game's icon prefab may not include a timer in newer versions.
-                var timer = interactableIcon.transform.Find("Timer");
-                if (timer != null)
-                {
-                    timer.gameObject.SetActive(false);
-                }
+                var interactableIcon = CreateRecapIcon(textMesh);
 
                 RawImage rawImage = interactableIcon.GetComponent<RawImage>();
                 rawImage.texture = interactableGroup.def.Texture;
@@ -155,7 +146,11 @@ namespace StageReport
                     GameObject itemIcon = Instantiate(printerItemIconPrefab, interactableIcon.transform);
                     if (!Application.isEditor)
                     {
-                        itemIcon.GetComponent<RawImage>().texture = ItemCatalog.GetItemDef(interactableGroup.itemIndex).pickupIconTexture;
+                        var itemDef = ItemCatalog.GetItemDef(interactableGroup.itemIndex);
+                        if (itemDef != null)
+                        {
+                            itemIcon.GetComponent<RawImage>().texture = itemDef.pickupIconTexture;
+                        }
                     }
                 }
                 else if (interactableGroup.def.charges == 0)
@@ -181,6 +176,34 @@ namespace StageReport
                 textMesh.text = $"{stageLabelText} - {Mathf.CeilToInt(percent)}%";
                 yield return new WaitForSeconds(interactableShowDelay);
             }
+        }
+
+        private GameObject CreateRecapIcon(HGTextMeshProUGUI heading)
+        {
+            // Own this simple UI instead of relying on the game's ItemIcon hierarchy.
+            var icon = new GameObject("StageRecapIcon", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(RawImage), typeof(TooltipProvider));
+            icon.transform.SetParent(interactablePanel.transform, false);
+            icon.GetComponent<RectTransform>().sizeDelta = new Vector2(64, 64);
+
+            var counter = new GameObject("Counter", typeof(RectTransform),
+                typeof(CanvasRenderer), typeof(HGTextMeshProUGUI));
+            counter.transform.SetParent(icon.transform, false);
+            var counterRect = counter.GetComponent<RectTransform>();
+            counterRect.anchorMin = Vector2.zero;
+            counterRect.anchorMax = Vector2.one;
+            counterRect.offsetMin = new Vector2(0, -8);
+            counterRect.offsetMax = new Vector2(8, 0);
+
+            var label = counter.GetComponent<HGTextMeshProUGUI>();
+            label.font = heading.font;
+            label.fontSharedMaterial = heading.fontSharedMaterial;
+            label.fontSize = 20;
+            label.alignment = TMPro.TextAlignmentOptions.BottomRight;
+            label.enableWordWrapping = false;
+            label.overflowMode = TMPro.TextOverflowModes.Overflow;
+            label.raycastTarget = false;
+            return icon;
         }
     }
 }

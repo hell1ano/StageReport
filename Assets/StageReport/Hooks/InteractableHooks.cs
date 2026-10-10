@@ -334,6 +334,11 @@ namespace StageReport
 
         public static int? FindInteractableIndex(uint netId)
         {
+            if (!InteractableTracker.instance || InteractableTracker.instance.trackedInteractables == null)
+            {
+                return null;
+            }
+
             return InteractableTracker.instance.trackedInteractables
                 .Select((x, i) => (
                     netId: x.netId,
