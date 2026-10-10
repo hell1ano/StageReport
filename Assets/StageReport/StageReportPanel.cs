@@ -167,6 +167,7 @@ namespace StageReport
 
                 RawImage rawImage = interactableIcon.GetComponent<RawImage>();
                 rawImage.texture = interactableGroup.def.Texture;
+                rawImage.enabled = rawImage.texture != null;
 
                 var stackText = interactableIcon.transform.GetChild(0);
                 HGTextMeshProUGUI stackLabel = stackText.GetComponent<HGTextMeshProUGUI>();

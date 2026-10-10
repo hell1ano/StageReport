@@ -392,7 +392,6 @@ namespace StageReport
 
             if (index == null)
             {
-                Log.Debug("index == null. netId = " + netId);
                 return false;
             }
 

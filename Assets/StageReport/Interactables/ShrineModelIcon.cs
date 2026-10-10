@@ -16,7 +16,7 @@ namespace StageReport
             }
             pending.Add(definition.type);
             // Let the spawned shrine initialize its model before copying it.
-            yield return null;
+            yield return new WaitForSeconds(0.5f);
             try
             {
                 if (source != null)
@@ -40,25 +40,36 @@ namespace StageReport
             preview.hideFlags = HideFlags.HideAndDontSave;
             RenderTexture target = null;
             var previousTarget = RenderTexture.active;
+            var bakedMeshes = new System.Collections.Generic.List<Mesh>();
             try
             {
-                // Copy only static model geometry, never the shrine's gameplay components.
+                // Copy model geometry only; bake animated meshes without gameplay components.
                 var hasBounds = false;
                 var bounds = new Bounds();
-                foreach (var renderer in source.GetComponentsInChildren<MeshRenderer>())
+                foreach (var renderer in source.GetComponentsInChildren<Renderer>(true))
                 {
-                    var filter = renderer.GetComponent<MeshFilter>();
-                    if (!renderer.enabled || filter == null || filter.sharedMesh == null)
+                    if (!renderer.enabled || !renderer.gameObject.activeInHierarchy) continue;
+                    Mesh mesh = null;
+                    var skinned = renderer as SkinnedMeshRenderer;
+                    if (skinned != null && skinned.sharedMesh != null)
                     {
-                        continue;
+                        mesh = new Mesh();
+                        bakedMeshes.Add(mesh);
+                        skinned.BakeMesh(mesh);
                     }
+                    else if (renderer is MeshRenderer)
+                    {
+                        var filter = renderer.GetComponent<MeshFilter>();
+                        if (filter != null) mesh = filter.sharedMesh;
+                    }
+                    if (mesh == null) continue;
                     var part = new GameObject("ModelPart", typeof(MeshFilter), typeof(MeshRenderer));
                     part.layer = 31;
                     part.transform.SetParent(preview.transform, false);
                     part.transform.position = renderer.transform.position - source.transform.position;
                     part.transform.rotation = renderer.transform.rotation;
                     part.transform.localScale = renderer.transform.lossyScale;
-                    part.GetComponent<MeshFilter>().sharedMesh = filter.sharedMesh;
+                    part.GetComponent<MeshFilter>().sharedMesh = mesh;
                     var copy = part.GetComponent<MeshRenderer>();
                     copy.sharedMaterials = renderer.sharedMaterials;
                     if (!hasBounds)
@@ -73,7 +84,7 @@ namespace StageReport
                 }
                 if (!hasBounds)
                 {
-                    throw new InvalidOperationException("The shrine has no visible static mesh.");
+                    throw new InvalidOperationException("The shrine has no visible mesh after initialization.");
                 }
 
                 // Keep the temporary model far away from the playing field.
@@ -109,7 +120,7 @@ namespace StageReport
                 camera.Render();
                 RenderTexture.active = target;
                 var texture = new Texture2D(128, 128, TextureFormat.RGBA32, false);
-                texture.name = "StageRecapCompulsionShrine";
+                texture.name = "StageRecapShrineModel";
                 texture.ReadPixels(new Rect(0, 0, 128, 128), 0, 0);
                 texture.Apply();
                 camera.targetTexture = null;
@@ -124,6 +135,7 @@ namespace StageReport
                     RenderTexture.ReleaseTemporary(target);
                 }
                 UnityEngine.Object.Destroy(preview);
+                foreach (var mesh in bakedMeshes) UnityEngine.Object.Destroy(mesh);
             }
         }
     }
