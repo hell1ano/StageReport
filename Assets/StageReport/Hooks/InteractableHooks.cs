@@ -324,7 +324,8 @@ namespace StageReport
             if (iconDefinition != null && (iconDefinition.type == InteractableType.CompulsionShrine || iconDefinition.type == InteractableType.HollowChestFree))
             {
                 if (!string.IsNullOrEmpty(self.displayNameToken)) iconDefinition.nameToken = self.displayNameToken;
-                Main.Instance.StartCoroutine(ShrineModelIcon.Capture(self.gameObject, iconDefinition));
+                if (iconDefinition.type == InteractableType.CompulsionShrine)
+                    Main.Instance.StartCoroutine(ShrineModelIcon.Capture(self.gameObject, iconDefinition));
             }
             if (NetworkServer.active)
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +26,7 @@ namespace StageReport
             {
                 var hollowChest = Instantiate(interactables.First(x => x.type == InteractableType.Chest));
                 hollowChest.name = "HollowChestFree";
+                hollowChest.SetRuntimeTexture(null);
                 hollowChest.type = InteractableType.HollowChestFree;
                 hollowChest.nameToken = "STAGERECAP_HOLLOW_CHEST_FREE_NAME";
                 hollowChest.gameObjectNames = new[] { "HollowChestFree(Clone)" };
@@ -44,8 +45,9 @@ namespace StageReport
                 interactables = interactables.Concat(new[] { compulsionShrine }).ToArray();
             }
 
-            // Use the actual models for both Hex interactables.
-            interactables.First(x => x.type == InteractableType.HollowChestFree).SetRuntimeTexture(null);
+            // The Reliquary uses dedicated artwork; only Compulsion needs model capture.
+            var reliquary = interactables.First(x => x.type == InteractableType.HollowChestFree);
+            if (reliquary.texture == null) reliquary.SetRuntimeTexture(LoadReliquaryIcon());
             interactables.First(x => x.type == InteractableType.CompulsionShrine).SetRuntimeTexture(null);
 
             var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);
@@ -63,6 +65,32 @@ namespace StageReport
                 .SelectMany(interactable => interactable.gameObjectNames
                     .Select(name => (interactable, name)))
                 .ToDictionary(x => x.name, x => x.interactable);
+        }
+
+        private static Texture2D LoadReliquaryIcon()
+        {
+            using (var stream = typeof(InteractablesCollection).Assembly.GetManifestResourceStream("StageReport.ConceptReliquary.png"))
+            {
+                if (stream == null)
+                {
+                    Log.Error("Concept Reliquary icon resource is missing.");
+                    return null;
+                }
+                using (var bytes = new System.IO.MemoryStream())
+                {
+                    stream.CopyTo(bytes);
+                    var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+                    if (!texture.LoadImage(bytes.ToArray()))
+                    {
+                        Destroy(texture);
+                        Log.Error("Concept Reliquary icon could not be decoded.");
+                        return null;
+                    }
+                    texture.name = "StageRecapConceptReliquary";
+                    texture.wrapMode = TextureWrapMode.Clamp;
+                    return texture;
+                }
+            }
         }
 
         public InteractableDef GetByGameObjectName(string name)
