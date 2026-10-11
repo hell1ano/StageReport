@@ -22,7 +22,6 @@ namespace StageReport
     [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
     public class Main : BaseUnityPlugin
     {
-        public static Main Instance { get; private set; }
         public const string PluginGUID = "Lawlzee.StageRecap";
         public const string PluginAuthor = "Lawlzee";
         public const string PluginName = "StageRecap";
@@ -30,7 +29,6 @@ namespace StageReport
 
         public void Awake()
         {
-            Instance = this;
             Log.Init(Logger);
 
             var texture = LoadTexture("icon.png");

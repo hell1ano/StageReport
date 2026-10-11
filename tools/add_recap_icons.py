@@ -28,7 +28,7 @@ def main():
     modified_ids = {bundle_reader.path_id}
     icons = Path(__file__).resolve().parents[1] / "Assets/StageReport/Interactables"
     expected_images = {}
-    for name in ("ConceptReliquary", "WakeAltar"):
+    for name in ("ConceptReliquary", "WakeAltar", "CompulsionShrine"):
         image = Image.open(icons / (name + ".png")).convert("RGBA")
         if image.size != (128, 128):
             raise ValueError(name + " must be 128 x 128")
@@ -69,7 +69,7 @@ def main():
         texture = objects[entries[key].asset.m_PathID].read()
         if texture.image.convert("RGBA").tobytes() != expected.tobytes():
             raise ValueError("Texture verification failed for " + name)
-    print("Verified both icons and preserved original bundle objects:", args.output)
+    print("Verified all icons and preserved original bundle objects:", args.output)
 
 
 if __name__ == "__main__":

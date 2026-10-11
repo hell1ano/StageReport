@@ -59,10 +59,11 @@ namespace StageReport
             var wakeDefinition = interactables.First(x => x.type == InteractableType.WakeAltar);
             if (wakeDefinition.texture == null) wakeDefinition.SetRuntimeTexture(LoadBundleIcon(bundle, "WakeAltar"));
 
-            // The Reliquary uses dedicated artwork; only Compulsion needs model capture.
+            // All added interactables use dedicated artwork from the asset bundle.
             var reliquary = interactables.First(x => x.type == InteractableType.HollowChestFree);
             if (reliquary.texture == null) reliquary.SetRuntimeTexture(LoadBundleIcon(bundle, "ConceptReliquary"));
-            interactables.First(x => x.type == InteractableType.CompulsionShrine).SetRuntimeTexture(null);
+            var compulsion = interactables.First(x => x.type == InteractableType.CompulsionShrine);
+            if (compulsion.texture == null) compulsion.SetRuntimeTexture(LoadBundleIcon(bundle, "CompulsionShrine"));
 
             var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);
             halcyoniteShrine.gameObjectNames = halcyoniteShrine.gameObjectNames
