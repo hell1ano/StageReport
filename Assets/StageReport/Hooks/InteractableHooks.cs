@@ -14,6 +14,8 @@ namespace StageReport
     {
         public static void Init()
         {
+            On.RoR2.WakeController.Start += WakeController_Start;
+            On.RoR2.WakeController.OnMissionStatusChanged += WakeController_OnMissionStatusChanged;
             On.RoR2.PurchaseInteraction.PreStartClient += PurchaseInteraction_PreStartClient;
             On.RoR2.PurchaseInteraction.OnDisable += PurchaseInteraction_OnDisable;
             On.RoR2.ShrineChanceBehavior.AddShrineStack += ShrineChanceBehavior_AddShrineStack;
@@ -34,6 +36,36 @@ namespace StageReport
             On.RoR2.CharacterBody.Start += CharacterBody_Start;
             On.RoR2.CharacterDeathBehavior.OnDeath += CharacterDeathBehavior_OnDeath;
             On.RoR2.ShopTerminalBehavior.UpdatePickupDisplayAndAnimations += ShopTerminalBehavior_UpdatePickupDisplayAndAnimations;
+        }
+
+        private static void WakeController_Start(On.RoR2.WakeController.orig_Start orig, WakeController self)
+        {
+            orig(self);
+            UpdateWakeAltar(self);
+        }
+
+        private static void WakeController_OnMissionStatusChanged(On.RoR2.WakeController.orig_OnMissionStatusChanged orig,
+            WakeController self, WakeController.MissionStatus status)
+        {
+            orig(self, status);
+            UpdateWakeAltar(self);
+        }
+
+        private static void UpdateWakeAltar(WakeController altar)
+        {
+            if (!NetworkServer.active || !InteractableTracker.instance || altar.gameObject.name != "WakeAltar(Clone)") return;
+            var identity = altar.GetComponent<NetworkIdentity>();
+            if (identity == null || identity.netId.Value == 0) return;
+            if (!FindInteractableIndex(identity.netId.Value).HasValue)
+                TryRegistering("WakeController", altar);
+            // Count activation, as with other single-use event shrines.
+            if (altar.missionStatus != WakeController.MissionStatus.Idle)
+                SetCharges(identity.netId.Value, 0);
+        }
+
+        public static void RefreshWakeAltars()
+        {
+            foreach (var altar in UnityEngine.Object.FindObjectsOfType<WakeController>()) UpdateWakeAltar(altar);
         }
 
         private static void AccessCodesMissionController_OnStartServer(On.RoR2.AccessCodesMissionController.orig_OnStartServer orig, AccessCodesMissionController self)

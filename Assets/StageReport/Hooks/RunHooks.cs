@@ -47,6 +47,7 @@ namespace StageReport
                 if (NetworkServer.active && InteractableTracker.instance)
                 {
                     InteractableHooks.RefreshPrinterItems();
+                    InteractableHooks.RefreshWakeAltars();
                     foreach (var entry in InteractableTracker.instance.trackedInteractables)
                     {
                         var visible = ModConfig.visibleInteractables.TryGetValue(entry.type, out var setting) && setting.Value;

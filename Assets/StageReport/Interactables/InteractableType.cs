@@ -90,6 +90,7 @@ namespace StageReport
         RechargeDrone,
 
         HollowChestFree,
-        CompulsionShrine
+        CompulsionShrine,
+        WakeAltar
     }
 }

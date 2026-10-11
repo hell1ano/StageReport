@@ -45,9 +45,23 @@ namespace StageReport
                 interactables = interactables.Concat(new[] { compulsionShrine }).ToArray();
             }
 
+            if (!interactables.Any(x => x.type == InteractableType.WakeAltar))
+            {
+                var wakeAltar = Instantiate(interactables.First(x => x.type == InteractableType.CombatShrine));
+                wakeAltar.name = "WakeAltar";
+                wakeAltar.type = InteractableType.WakeAltar;
+                wakeAltar.nameToken = "STAGERECAP_WAKE_ALTAR_NAME";
+                wakeAltar.charges = 1;
+                wakeAltar.SetRuntimeTexture(null);
+                wakeAltar.gameObjectNames = new[] { "WakeAltar(Clone)" };
+                interactables = interactables.Concat(new[] { wakeAltar }).ToArray();
+            }
+            var wakeDefinition = interactables.First(x => x.type == InteractableType.WakeAltar);
+            if (wakeDefinition.texture == null) wakeDefinition.SetRuntimeTexture(LoadEmbeddedIcon("WakeAltar"));
+
             // The Reliquary uses dedicated artwork; only Compulsion needs model capture.
             var reliquary = interactables.First(x => x.type == InteractableType.HollowChestFree);
-            if (reliquary.texture == null) reliquary.SetRuntimeTexture(LoadReliquaryIcon());
+            if (reliquary.texture == null) reliquary.SetRuntimeTexture(LoadEmbeddedIcon("ConceptReliquary"));
             interactables.First(x => x.type == InteractableType.CompulsionShrine).SetRuntimeTexture(null);
 
             var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);
@@ -67,13 +81,13 @@ namespace StageReport
                 .ToDictionary(x => x.name, x => x.interactable);
         }
 
-        private static Texture2D LoadReliquaryIcon()
+        private static Texture2D LoadEmbeddedIcon(string iconName)
         {
-            using (var stream = typeof(InteractablesCollection).Assembly.GetManifestResourceStream("StageReport.ConceptReliquary.png"))
+            using (var stream = typeof(InteractablesCollection).Assembly.GetManifestResourceStream("StageReport." + iconName + ".png"))
             {
                 if (stream == null)
                 {
-                    Log.Error("Concept Reliquary icon resource is missing.");
+                    Log.Error(iconName + " icon resource is missing.");
                     return null;
                 }
                 using (var bytes = new System.IO.MemoryStream())
@@ -83,10 +97,10 @@ namespace StageReport
                     if (!texture.LoadImage(bytes.ToArray()))
                     {
                         Destroy(texture);
-                        Log.Error("Concept Reliquary icon could not be decoded.");
+                        Log.Error(iconName + " icon could not be decoded.");
                         return null;
                     }
-                    texture.name = "StageRecapConceptReliquary";
+                    texture.name = "StageRecap" + iconName;
                     texture.wrapMode = TextureWrapMode.Clamp;
                     return texture;
                 }

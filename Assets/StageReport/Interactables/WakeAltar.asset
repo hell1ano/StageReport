@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49a8e7e0d0e08da428a79d57d8d6d842, type: 3}
+  m_Name: WakeAltar
+  m_EditorClassIdentifier: 
+  type: 67
+  nameToken: STAGERECAP_WAKE_ALTAR_NAME
+  texture: {fileID: 2800000, guid: ac2c14a4c857430588f9942c4b6866f4, type: 3}
+  textureKey: 
+  charges: 1
+  defaultScoreWeight: 0
+  gameObjectNames:
+  - WakeAltar(Clone)
