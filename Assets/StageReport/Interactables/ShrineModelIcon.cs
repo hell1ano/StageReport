@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Linq;
+using RoR2;
 using UnityEngine;
 
 namespace StageReport
@@ -15,18 +17,46 @@ namespace StageReport
                 yield break;
             }
             pending.Add(definition.type);
-            // Let the spawned shrine initialize its model before copying it.
-            yield return new WaitForSeconds(0.5f);
             try
             {
+                // Models may be assigned later or referenced outside the network object's hierarchy.
+                Exception lastFailure = null;
+                for (int attempt = 0; attempt < 20 && source != null; attempt++)
+                {
+                    yield return new WaitForSeconds(0.1f);
+                    Texture2D icon = null;
+                    bool fatalFailure = false;
+                    try
+                    {
+                        icon = Render(source);
+                    }
+                    catch (InvalidOperationException exception)
+                    {
+                        lastFailure = exception;
+                    }
+                    catch (Exception exception)
+                    {
+                        Log.Error("Could not render shrine icon for " + source.name + ": " + exception);
+                        fatalFailure = true;
+                    }
+                    if (fatalFailure) yield break;
+                    if (icon != null)
+                    {
+                        definition.SetRuntimeTexture(icon);
+                        Log.Debug("Shrine icon captured: " + source.name);
+                        yield break;
+                    }
+                }
                 if (source != null)
                 {
-                    definition.SetRuntimeTexture(Render(source));
+                    var locator = source.GetComponent<ModelLocator>();
+                    var details = string.Join(", ", source.GetComponentsInChildren<Renderer>(true)
+                        .Select(renderer => renderer.name + ":" + renderer.GetType().Name));
+                    Log.Error("Could not capture shrine icon for " + source.name +
+                        "; referenced model=" + (locator != null && locator.modelTransform != null
+                            ? locator.modelTransform.name : "none") +
+                        "; child renderers=[" + details + "]; " + lastFailure);
                 }
-            }
-            catch (Exception exception)
-            {
-                Log.Error("Could not render shrine icon: " + exception);
             }
             finally
             {
@@ -46,9 +76,14 @@ namespace StageReport
                 // Copy model geometry only; bake animated meshes without gameplay components.
                 var hasBounds = false;
                 var bounds = new Bounds();
-                foreach (var renderer in source.GetComponentsInChildren<Renderer>(true))
+                var renderers = source.GetComponentsInChildren<Renderer>(true).AsEnumerable();
+                var locator = source.GetComponent<ModelLocator>();
+                if (locator != null && locator.modelTransform != null)
                 {
-                    if (!renderer.enabled || !renderer.gameObject.activeInHierarchy) continue;
+                    renderers = renderers.Concat(locator.modelTransform.GetComponentsInChildren<Renderer>(true));
+                }
+                foreach (var renderer in renderers.Distinct())
+                {
                     Mesh mesh = null;
                     var skinned = renderer as SkinnedMeshRenderer;
                     if (skinned != null && skinned.sharedMesh != null)
