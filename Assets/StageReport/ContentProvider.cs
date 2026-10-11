@@ -42,7 +42,7 @@ namespace StageReport
 
             yield return LoadAllAssetsAsync(stageReportBundle, args.progressReceiver, (Action<InteractablesCollection[]>)((assets) =>
             {
-                assets.First().Init();
+                assets.First().Init(stageReportBundle);
             }));
             
             yield return LoadAllAssetsAsync(stageReportBundle, args.progressReceiver, (Action<GameObject[]>)((assets) =>

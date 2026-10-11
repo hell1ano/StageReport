@@ -17,7 +17,7 @@ namespace StageReport
         private Dictionary<string, InteractableDef> _interactableByGameObjectName;
         public InteractableDef[] interactables;
 
-        public void Init()
+        public void Init(AssetBundle bundle)
         {
             instance = this;
 
@@ -57,11 +57,11 @@ namespace StageReport
                 interactables = interactables.Concat(new[] { wakeAltar }).ToArray();
             }
             var wakeDefinition = interactables.First(x => x.type == InteractableType.WakeAltar);
-            if (wakeDefinition.texture == null) wakeDefinition.SetRuntimeTexture(LoadEmbeddedIcon("WakeAltar"));
+            if (wakeDefinition.texture == null) wakeDefinition.SetRuntimeTexture(LoadBundleIcon(bundle, "WakeAltar"));
 
             // The Reliquary uses dedicated artwork; only Compulsion needs model capture.
             var reliquary = interactables.First(x => x.type == InteractableType.HollowChestFree);
-            if (reliquary.texture == null) reliquary.SetRuntimeTexture(LoadEmbeddedIcon("ConceptReliquary"));
+            if (reliquary.texture == null) reliquary.SetRuntimeTexture(LoadBundleIcon(bundle, "ConceptReliquary"));
             interactables.First(x => x.type == InteractableType.CompulsionShrine).SetRuntimeTexture(null);
 
             var halcyoniteShrine = interactables.First(x => x.type == InteractableType.ShrineHalcyonite);
@@ -81,30 +81,12 @@ namespace StageReport
                 .ToDictionary(x => x.name, x => x.interactable);
         }
 
-        private static Texture2D LoadEmbeddedIcon(string iconName)
+        private static Texture2D LoadBundleIcon(AssetBundle bundle, string iconName)
         {
-            using (var stream = typeof(InteractablesCollection).Assembly.GetManifestResourceStream("StageReport." + iconName + ".png"))
-            {
-                if (stream == null)
-                {
-                    Log.Error(iconName + " icon resource is missing.");
-                    return null;
-                }
-                using (var bytes = new System.IO.MemoryStream())
-                {
-                    stream.CopyTo(bytes);
-                    var texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-                    if (!texture.LoadImage(bytes.ToArray()))
-                    {
-                        Destroy(texture);
-                        Log.Error(iconName + " icon could not be decoded.");
-                        return null;
-                    }
-                    texture.name = "StageRecap" + iconName;
-                    texture.wrapMode = TextureWrapMode.Clamp;
-                    return texture;
-                }
-            }
+            var path = "assets/stagereport/interactables/" + iconName.ToLowerInvariant() + ".png";
+            var texture = bundle != null ? bundle.LoadAsset<Texture2D>(path) : null;
+            if (texture == null) Log.Error(iconName + " icon is missing from stagerecap. Install the matching asset bundle.");
+            return texture;
         }
 
         public InteractableDef GetByGameObjectName(string name)
