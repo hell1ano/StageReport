@@ -1,4 +1,4 @@
-﻿using RoR2;
+using RoR2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -169,7 +169,7 @@ namespace StageReport
             if (NetworkServer.active)
             {
                 uint netId = self.GetComponent<NetworkIdentity>().netId.Value;
-                SetCharges(netId, 0);
+                SetCharges(netId, 0, logMissing: false);
             }
         }
 
@@ -417,12 +417,15 @@ namespace StageReport
                 .FirstOrDefault();
         }
 
-        private static bool SetCharges(uint netId, int charges)
+        private static bool SetCharges(uint netId, int charges, bool logMissing = true)
         {
             int? index = FindInteractableIndex(netId);
 
             if (index == null)
             {
+                if (logMissing)
+                    Log.Debug("Missing tracked interactable. netId = " + netId);
+
                 return false;
             }
 
